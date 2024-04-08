@@ -1,10 +1,10 @@
 import java.util.ArrayList;
 
 public class Bullet {
-    int x, y;
-    public static final int MAXPEED = 4;
+    double x, y;
+    public static final int MAXPEED = 20;
     PolarCoords direction = null;
-    Bullet(int xPos, int yPos, PolarCoords d) {
+    Bullet(double xPos, double yPos, PolarCoords d) {
         x = xPos;
         y = yPos;
         direction = d;

@@ -1,8 +1,8 @@
 import java.awt.*;
 
 public class Ship {
-    int globalCenterX = 100, globalCenterY = 100, rotation = 0, maximumSpeed = 4;
-    double maximumThrust = 2;
+    double globalCenterX = 100, globalCenterY = 100, rotation = 0, maximumSpeed = 10;
+    double maximumThrust = 0.2;
     PolarCoords[] verticies = new PolarCoords[4];
     //thrust direction, to be added to heading when moving
     PolarCoords thrustDirection = null;
@@ -22,7 +22,7 @@ public class Ship {
         }
         thrustDirection = PolarCoords.normalizedReturned(verticies[0], maximumThrust);
     }
-    void turn(int degrees) {
+    void turn(double degrees) {
         rotation+=degrees;
         for (int i = 0; i < verticies.length; i++) {
             verticies[i].turn(degrees);
@@ -32,41 +32,28 @@ public class Ship {
         thrustDirection.turn(degrees);
     }
     void move() {
-        if (heading.magnitude != 0) {
-            for (int i = 0; i < verticies.length; i++) {
-                verticies[i].localX += heading.globalX-heading.localX;
-                verticies[i].localY += heading.globalY-heading.localY;
-                verticies[i].recalculateGlobalCoords();
-                xCoords[i] = (int)verticies[i].globalX;
-                yCoords[i] = (int)verticies[i].globalY;
-            }
-            globalCenterX = (int)verticies[0].localX;
-            globalCenterY = (int)verticies[0].localY;
-            heading.localX = globalCenterX;
-            heading.localY = globalCenterY;
-            heading.recalculateGlobalCoords();
-            thrustDirection.localX = globalCenterX;
-            thrustDirection.localY = globalCenterY;
-            thrustDirection.recalculateGlobalCoords();
-            applyFriction();
+        for (int i = 0; i < verticies.length; i++) {
+            double newX = verticies[i].localX+heading.globalX-heading.localX;
+            double newY = verticies[i].localY+heading.globalY-heading.localY;
+            verticies[i].setNewLocalCoords(newX, newY);
+            xCoords[i] = (int)verticies[i].globalX;
+            yCoords[i] = (int)verticies[i].globalY;
         }
+        globalCenterX = (int)verticies[0].localX;
+        globalCenterY = (int)verticies[0].localY;
+        heading.setNewLocalCoords(globalCenterX, globalCenterY);
+        thrustDirection.setNewLocalCoords(globalCenterX, globalCenterY);
+        applyFriction();
     }
     public void applyThrusters() {
-        //heading = PolarCoords.add(heading, thrustDirection);
-        //heading.normalize(maximumSpeed);
-        //heading = new PolarCoords((int)thrustDirection.localX, (int)thrustDirection.localY, (int)thrustDirection.rotation, (int)thrustDirection.magnitude);
-        //thrustDirection.normalize(2);
         heading = PolarCoords.add(heading, thrustDirection, maximumSpeed);
     }
     private void applyFriction() {
-        //System.out.println(heading.magnitude);
-        return; 
-        // if (heading.magnitude>0.1){
-        //     heading.magnitude*=0.97;
-        //     heading.recalculateGlobalCoords();
-        // }
-        // else {
-        //     heading.magnitude = 0;
-        // }
+        if (heading.magnitude>0.01){
+            heading.normalize(heading.magnitude*0.99);
+        }
+        else {
+            heading.magnitude = 0;
+        }
     }
 }

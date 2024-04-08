@@ -2,6 +2,8 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.IOException;
 
 // Main game logic
 class GamePanel extends JPanel implements KeyListener, ActionListener, MouseListener{
@@ -9,8 +11,9 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	int boxx;
 	boolean []keys, pressedKeys;
 	Font comicFnt=null;
+	Font UIFnt = null;
 	Image back;
-	int shipRotateSpeed = 3;
+	double shipRotateSpeed = 6;
 	boolean canShoot = false;
 
 	Ship myShip = new Ship();
@@ -23,8 +26,13 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	public GamePanel(){
 		setPreferredSize(new Dimension(800, 600));
 		comicFnt = new Font("Comic Sans MS", Font.PLAIN, 32);
-		back = loadImage("OuterSpace.jpg");		
-		
+		back = loadImage("img/OuterSpace.jpg");
+		try{
+		UIFnt = Font.createFont(Font.TRUETYPE_FONT, new File("fonts/Hyperspace-JvEM.ttf")).deriveFont(14f);
+		}
+		catch (IOException | FontFormatException e) {
+			System.out.println("font did not load");
+		}
 		keys = new boolean[1000];
 		pressedKeys = new boolean[1000];
 		boxx = 100;
@@ -47,7 +55,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 			myShip.applyThrusters();
 		}
 		if (keys[KeyEvent.VK_SPACE] && canShoot) {
-			activeBullets.add(new Bullet(myShip.globalCenterX, myShip.globalCenterY, PolarCoords.normalizedReturned(myShip.thrustDirection, Bullet.MAXPEED)));
+			activeBullets.add(new Bullet(myShip.globalCenterX, myShip.globalCenterY, PolarCoords.normalizedReturned(myShip.verticies[0], Bullet.MAXPEED)));
 			canShoot = false;
 		}
 		//System.out.println(activeBullets.size());
@@ -69,7 +77,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	public void	keyReleased(KeyEvent e){
 		//System.out.println(e.getKeyCode());
 		keys[e.getKeyCode()] = false;
-		System.out.println(e.getKeyChar());
+		//System.out.println(e.getKeyChar());
 		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
 			canShoot = true;
 		}
@@ -100,8 +108,9 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	public void paint(Graphics g){
 		//g.setColor(new Color(111,222,111));
 		//g.fillRect(0,0,getWidth(),getHeight());
-		g.drawImage(back, 0, 0, null);
-		g.setColor(Color.RED);
+		g.setColor(Color.BLACK);
+		g.fillRect(0,0, getWidth(), getHeight());
+		g.setColor(Color.WHITE);
 		//g.fillRect(boxx,200,40,40);
 		
 		Point mouse = MouseInfo.getPointerInfo().getLocation();
@@ -109,16 +118,18 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		
 		int mx = mouse.x-offset.x;
 		int my = mouse.y-offset.y;
-		g.setFont(comicFnt);
+		g.setFont(UIFnt);
 		g.drawString(String.format("(%d,%d)\n",mx,my), 50,50);
 		g.drawPolygon(myShip.xCoords, myShip.yCoords, myShip.verticies.length);
-		g.drawOval(myShip.globalCenterX-5, myShip.globalCenterY-5, 10, 10);
+		g.drawOval((int)myShip.globalCenterX-5, (int)myShip.globalCenterY-5, 10, 10);
+		g.setColor(Color.GREEN);
 		//g.drawLine((int)myShip.thrustDirection.localX, (int)myShip.thrustDirection.localY, (int)myShip.thrustDirection.globalX, (int)myShip.thrustDirection.globalY);
 		for (int i = 0; i < activeBullets.size(); i++) {
 			if (i > activeBullets.size()-1) {break;}
-			g.drawRect(activeBullets.get(i).x, activeBullets.get(i).y, 10, 10);
+			g.drawRect((int)activeBullets.get(i).x, (int)activeBullets.get(i).y, 10, 10);
 			activeBullets.get(i).move(i, activeBullets);
 		}
+		g.setColor(Color.PINK);
 		g.drawLine((int)myShip.verticies[0].localX, (int)myShip.verticies[0].localY, (int)myShip.verticies[0].globalX, (int)myShip.verticies[0].globalY);
     }
 }
