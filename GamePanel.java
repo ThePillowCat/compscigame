@@ -1,18 +1,21 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.util.ArrayList;
 
 // Main game logic
 class GamePanel extends JPanel implements KeyListener, ActionListener, MouseListener{
 	Timer timer;
 	int boxx;
-	boolean []keys;
+	boolean []keys, pressedKeys;
 	Font comicFnt=null;
 	Image back;
 	int shipRotateSpeed = 3;
 
+
 	Ship myShip = new Ship();
-		
+	ArrayList<Bullet> activeBullets = new ArrayList<Bullet>();
+	
 	public Image loadImage(String img){
 		return new ImageIcon(img).getImage();
 	}
@@ -23,6 +26,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		back = loadImage("OuterSpace.jpg");		
 		
 		keys = new boolean[1000];
+		pressedKeys = new boolean[1000];
 		boxx = 100;
 		timer = new Timer(16, this);
 		timer.start();
@@ -42,6 +46,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		if(keys[KeyEvent.VK_W]){
 			myShip.applyThrusters();
 		}
+		if (keys[KeyEvent.VK_SPACE]) {
+			activeBullets.add(new Bullet(myShip.globalCenterX, myShip.globalCenterY, PolarCoords.normalizedReturned(myShip.verticies[0], Bullet.MAXPEED)));
+		}
+		System.out.println(activeBullets.size());
 		myShip.move();
 	}
 	
@@ -58,6 +66,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 
 	@Override
 	public void	keyReleased(KeyEvent e){
+		//System.out.println(e.getKeyCode());
 		keys[e.getKeyCode()] = false;
 	}
 
@@ -100,6 +109,11 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		g.drawPolygon(myShip.xCoords, myShip.yCoords, myShip.verticies.length);
 		g.drawOval(myShip.globalCenterX-5, myShip.globalCenterY-5, 10, 10);
 		g.drawLine((int)myShip.thrustDirection.localX, (int)myShip.thrustDirection.localY, (int)myShip.thrustDirection.globalX, (int)myShip.thrustDirection.globalY);
+		for (int i = 0; i < activeBullets.size(); i++) {
+			if (i > activeBullets.size()-1) {break;}
+			g.drawRect(activeBullets.get(i).x, activeBullets.get(i).y, 10, 10);
+			activeBullets.get(i).move(i, activeBullets);
+		}
 		//g.drawLine((int)myShip.verticies[0].localX, (int)myShip.verticies[0].localY, (int)myShip.verticies[0].globalX, (int)myShip.verticies[0].globalY);
     }
 }

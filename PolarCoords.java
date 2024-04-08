@@ -16,11 +16,17 @@ public class PolarCoords {
     }
     static PolarCoords add(PolarCoords p1, PolarCoords p2) {
         int netXComponenet = (int)((p2.globalX-p2.localX)+(p1.globalX-p1.localX));
-        int netYComponent = (int)((p2.globalY-p2.localY)+(p1.globalY-p1.localY));
+        int netYComponent = (int)(-(p2.globalY-p2.localY)+(p1.globalY-p1.localY));
         int angle = (int)Math.toDegrees(Math.atan2(netYComponent, netXComponenet));
         return new PolarCoords((int)p1.localX, (int)p1.localY, (int)angle, 10);
     }
-    void normalize(int mag) {
+    static PolarCoords normalizedReturned(PolarCoords p1, double mag) {
+        if (distance(p1.localX, p1.localY, p1.globalX, p1.globalY) > mag) {
+            return new PolarCoords((int)p1.localX, (int)p1.localY, (int)p1.rotation, (int)mag);
+        }
+        return new PolarCoords((int)p1.localX, (int)p1.localY, (int)p1.rotation, (int)p1.magnitude);
+    }
+    void normalize(double mag) {
         if (distance(localX, localY, globalX, globalY) > mag) {
             magnitude = mag;
             recalculateGlobalCoords();
