@@ -11,7 +11,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	Font comicFnt=null;
 	Image back;
 	int shipRotateSpeed = 3;
-
+	boolean canShoot = false;
 
 	Ship myShip = new Ship();
 	ArrayList<Bullet> activeBullets = new ArrayList<Bullet>();
@@ -46,10 +46,11 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		if(keys[KeyEvent.VK_W]){
 			myShip.applyThrusters();
 		}
-		if (keys[KeyEvent.VK_SPACE]) {
-			activeBullets.add(new Bullet(myShip.globalCenterX, myShip.globalCenterY, PolarCoords.normalizedReturned(myShip.verticies[0], Bullet.MAXPEED)));
+		if (keys[KeyEvent.VK_SPACE] && canShoot) {
+			activeBullets.add(new Bullet(myShip.globalCenterX, myShip.globalCenterY, PolarCoords.normalizedReturned(myShip.thrustDirection, Bullet.MAXPEED)));
+			canShoot = false;
 		}
-		System.out.println(activeBullets.size());
+		//System.out.println(activeBullets.size());
 		myShip.move();
 	}
 	
@@ -68,6 +69,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	public void	keyReleased(KeyEvent e){
 		//System.out.println(e.getKeyCode());
 		keys[e.getKeyCode()] = false;
+		System.out.println(e.getKeyChar());
+		if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+			canShoot = true;
+		}
 	}
 
 	@Override
@@ -108,12 +113,12 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		g.drawString(String.format("(%d,%d)\n",mx,my), 50,50);
 		g.drawPolygon(myShip.xCoords, myShip.yCoords, myShip.verticies.length);
 		g.drawOval(myShip.globalCenterX-5, myShip.globalCenterY-5, 10, 10);
-		g.drawLine((int)myShip.thrustDirection.localX, (int)myShip.thrustDirection.localY, (int)myShip.thrustDirection.globalX, (int)myShip.thrustDirection.globalY);
+		//g.drawLine((int)myShip.thrustDirection.localX, (int)myShip.thrustDirection.localY, (int)myShip.thrustDirection.globalX, (int)myShip.thrustDirection.globalY);
 		for (int i = 0; i < activeBullets.size(); i++) {
 			if (i > activeBullets.size()-1) {break;}
 			g.drawRect(activeBullets.get(i).x, activeBullets.get(i).y, 10, 10);
 			activeBullets.get(i).move(i, activeBullets);
 		}
-		//g.drawLine((int)myShip.verticies[0].localX, (int)myShip.verticies[0].localY, (int)myShip.verticies[0].globalX, (int)myShip.verticies[0].globalY);
+		g.drawLine((int)myShip.verticies[0].localX, (int)myShip.verticies[0].localY, (int)myShip.verticies[0].globalX, (int)myShip.verticies[0].globalY);
     }
 }

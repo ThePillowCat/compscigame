@@ -2,7 +2,7 @@ import java.util.*;
 
 public class PolarCoords {
     public double rotation, magnitude, localX, localY, globalX, globalY;
-    PolarCoords(int x, int y, int rotation, int magnitude) {
+    PolarCoords(double x, double y, double rotation, double magnitude) {
         this.localX = x;
         this.localY = y;
         this.rotation = rotation;
@@ -14,11 +14,11 @@ public class PolarCoords {
         this.rotation += degrees;
         recalculateGlobalCoords();
     }
-    static PolarCoords add(PolarCoords p1, PolarCoords p2) {
+    static PolarCoords add(PolarCoords p1, PolarCoords p2, int mag) {
         int netXComponenet = (int)((p2.globalX-p2.localX)+(p1.globalX-p1.localX));
-        int netYComponent = (int)(-(p2.globalY-p2.localY)+(p1.globalY-p1.localY));
+        int netYComponent = (int)(-(p2.globalY-p2.localY)-(p1.globalY-p1.localY));
         int angle = (int)Math.toDegrees(Math.atan2(netYComponent, netXComponenet));
-        return new PolarCoords((int)p1.localX, (int)p1.localY, (int)angle, 10);
+        return new PolarCoords((int)p1.localX, (int)p1.localY, angle, mag);
     }
     static PolarCoords normalizedReturned(PolarCoords p1, double mag) {
         if (distance(p1.localX, p1.localY, p1.globalX, p1.globalY) > mag) {
