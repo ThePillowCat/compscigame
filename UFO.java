@@ -1,33 +1,48 @@
-import java.util.Random;
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Polygon;
 import java.awt.geom.Area;
+import java.util.ArrayList;
 
-public class Asteroid {
-    PolarCoords[] verticies = new PolarCoords[20];
-    double globalCenterX, globalCenterY, rotation = 0, maximumSpeed = 10, maximumThrust = 0.2;
-    int [] xCoords = new int[20], yCoords = new int[20];
-    int numOfVerticies = 0, minimumRadius, varient;
-    PolarCoords direction = null;
+public class UFO {
+    int globalCenterX, globalCenterY, numOfVerticies = 9, rotation = 0;
+    final int MAXSPEED = 5;
+    int[] xCoords = new int[10];
+    int[] yCoords = new int[10];
     Polygon myPoly = null;
     Area myArea = null;
-    Random rand = new Random();
+    PolarCoords direction = null;
+    PolarCoords[] verticies = new PolarCoords[10];
 
-    Asteroid(PolarCoords d, int minRad, int v) {
-        varient = v;
-        direction = d;
-        globalCenterX = d.localX;
-        globalCenterY = d.localY;
-        minimumRadius = minRad;
-        numOfVerticies = constructAsteroidShape();
-        for (int i = 0;  i < numOfVerticies; i++) {
+    UFO (int x, int y, PolarCoords d) {
+        globalCenterX = x;
+        globalCenterY = y;
+        verticies[0] = new PolarCoords(globalCenterX, globalCenterY, 20, 10);
+        verticies[1] = new PolarCoords(globalCenterX, globalCenterY, 70, 20);
+        verticies[2] = new PolarCoords(globalCenterX, globalCenterY, 110, 20);
+        verticies[3] = new PolarCoords(globalCenterX, globalCenterY, 160, 10);
+        verticies[4] = new PolarCoords(globalCenterX, globalCenterY, 190, 25);
+        verticies[5] = new PolarCoords(globalCenterX, globalCenterY, 230, 25);
+        verticies[6] = new PolarCoords(globalCenterX, globalCenterY, 270, 19);
+        verticies[7] = new PolarCoords(globalCenterX, globalCenterY, 310, 25);
+        verticies[8] = new PolarCoords(globalCenterX, globalCenterY, 350, 25);
+        for (int i = 0;  i < 9; i++) {
             xCoords[i] = (int)verticies[i].globalX;
             yCoords[i] = (int)verticies[i].globalY;
         }
         myPoly = new Polygon(xCoords, yCoords, numOfVerticies);
-        myArea = new Area(myPoly);
+        direction = d.resizeVectorReturned(MAXSPEED);
+        turn(direction.rotation);
     }
-    void move() {
-        turn(0.5);
+    void shootAtPlayer(ArrayList a, int playerX, int playerY) {
+
+    }
+    void drawSelf(Graphics g) {
+        g.drawPolygon(xCoords, yCoords, numOfVerticies);
+        g.drawLine((int)verticies[0].globalX, (int)verticies[0].globalY, (int)verticies[3].globalX, (int)verticies[3].globalY);
+        g.drawLine((int)verticies[4].globalX, (int)verticies[4].globalY, (int)verticies[8].globalX, (int)verticies[8].globalY);
+        //turn(3);
+    }
+    void moveSelf() {
         for (int i = 0; i < numOfVerticies; i++) {
             double newX = verticies[i].localX+direction.globalX-direction.localX;
             double newY = verticies[i].localY+direction.globalY-direction.localY;
@@ -63,15 +78,6 @@ public class Asteroid {
         }
         myPoly = new Polygon(xCoords, yCoords, numOfVerticies);
         myArea = new Area(myPoly);
-    }
-    int constructAsteroidShape() {
-        int angle = 0, currentIndex = 0;
-        while (angle < 360) {
-            verticies[currentIndex] = new PolarCoords(globalCenterX, globalCenterY, angle, rand.nextDouble()*(minimumRadius*((double)(3/2)))+minimumRadius);
-            angle+=rand.nextDouble()*40+20; //ratio should be 3 - 2
-            currentIndex+=1;
-        }
-        return currentIndex-1;
     }
     void turn(double degrees) {
         rotation+=degrees;

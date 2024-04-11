@@ -13,7 +13,7 @@ import javax.swing.*;
 
 //stays the same as program grows
 public class Game0 extends JFrame{
-	GamePanel game= new GamePanel();
+	GamePanel game = new GamePanel();
 		
     public Game0() {
 		super("Basic Game Setup");

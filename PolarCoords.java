@@ -17,7 +17,7 @@ public class PolarCoords {
     static PolarCoords add(PolarCoords p1, PolarCoords p2, double mag) {
         double netXComponenet = ((p2.globalX-p2.localX)+(p1.globalX-p1.localX));
         double netYComponent = (-(p2.globalY-p2.localY)-(p1.globalY-p1.localY));
-        double angle = (Math.toDegrees(Math.atan2(netYComponent, netXComponenet)) + 360) % 360;
+        double angle = (Math.toDegrees(Math.atan2(netYComponent, netXComponenet)));
         double resultantMagnitude = distance(0, 0, netXComponenet, netYComponent);
         return new PolarCoords(p1.localX, p1.localY, angle, Math.min(mag, resultantMagnitude));
     }
@@ -32,6 +32,9 @@ public class PolarCoords {
             magnitude = mag;
             recalculateGlobalCoords();
         }
+    }
+    PolarCoords resizeVectorReturned(double mag) {
+        return new PolarCoords(localX, localY, rotation, mag);
     }
     private static double distance(double x1, double y1, double x2, double y2) {
         return Math.sqrt((x1-x2)*(x1-x2)+(y1-y2)*(y1-y2));

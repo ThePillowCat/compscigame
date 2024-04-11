@@ -1,16 +1,16 @@
 import java.awt.*;
+import java.awt.geom.*;
 
 public class Ship {
-    double globalCenterX = 100, globalCenterY = 100, rotation = 0, maximumSpeed = 10;
-    double maximumThrust = 0.2;
+    static int lives = 3;
+    double globalCenterX = 400, globalCenterY = 300, rotation = 0, maximumSpeed = 20, maximumThrust = 0.15;
     PolarCoords[] verticies = new PolarCoords[4];
-    //thrust direction, to be added to heading when moving
     PolarCoords thrustDirection = null;
-    //overall direction the spaceship is heading on a fram - starts with a 0 magnitude vector
     PolarCoords heading = new PolarCoords(globalCenterX, globalCenterY, 0, 0);
-    PolarCoords friction = null;
     int[] xCoords = new int[4];
     int[] yCoords = new int[4];
+    Polygon myPoly = new Polygon(xCoords, yCoords, verticies.length);
+    Area myArea = new Area(myPoly);
     Ship() {
         verticies[0] = new PolarCoords(globalCenterX, globalCenterY, rotation, 30);
         verticies[1] = new PolarCoords(globalCenterX, globalCenterY, rotation+120, 30);
@@ -32,15 +32,19 @@ public class Ship {
         thrustDirection.turn(degrees);
     }
     void move() {
-        for (int i = 0; i < verticies.length; i++) {
-            double newX = verticies[i].localX+heading.globalX-heading.localX;
-            double newY = verticies[i].localY+heading.globalY-heading.localY;
-            verticies[i].setNewLocalCoords(newX, newY);
-            xCoords[i] = (int)verticies[i].globalX;
-            yCoords[i] = (int)verticies[i].globalY;
-        }
-        globalCenterX = (int)verticies[0].localX;
-        globalCenterY = (int)verticies[0].localY;
+        // for (int i = 0; i < verticies.length; i++) {
+        //     double newX = verticies[i].localX+heading.globalX-heading.localX;
+        //     double newY = verticies[i].localY+heading.globalY-heading.localY;
+        //     verticies[i].setNewLocalCoords(newX, newY);
+        //     xCoords[i] = (int)verticies[i].globalX;
+        //     yCoords[i] = (int)verticies[i].globalY;
+        // }
+        // globalCenterX = (int)verticies[0].localX;
+        // globalCenterY = (int)verticies[0].localY;
+        moveShipAndVerticiesToCoords(globalCenterX+(heading.globalX-heading.localX), globalCenterY+(heading.globalY-heading.localY));
+        keepInBounds();
+        myPoly = new Polygon(xCoords, yCoords, verticies.length);
+        myArea = new Area(myPoly);
         heading.setNewLocalCoords(globalCenterX, globalCenterY);
         thrustDirection.setNewLocalCoords(globalCenterX, globalCenterY);
         applyFriction();
@@ -55,5 +59,44 @@ public class Ship {
         else {
             heading.magnitude = 0;
         }
+    }
+    private void keepInBounds() {
+        int numOfVerticies = verticies.length;
+        if (globalCenterX > 800) {
+            globalCenterX -= 800;
+            for (int i = 0; i < numOfVerticies; i++) {
+                verticies[i].setNewLocalCoords(verticies[i].localX-800, verticies[i].localY);
+            }
+        }
+        if (globalCenterY > 600) {
+            globalCenterY -= 600;
+            for (int i = 0; i < numOfVerticies; i++) {
+                verticies[i].setNewLocalCoords(verticies[i].localX, verticies[i].localY-600);
+            }
+        }
+        if (globalCenterX < 0) {
+            globalCenterX += 800;
+            for (int i = 0; i < numOfVerticies; i++) {
+                verticies[i].setNewLocalCoords(verticies[i].localX+800, verticies[i].localY);
+            }
+        }
+        if (globalCenterY < 0) {
+            globalCenterY += 600;
+            for (int i = 0; i < numOfVerticies; i++) {
+                verticies[i].setNewLocalCoords(verticies[i].localX, verticies[i].localY+600);
+            }
+        }
+    }
+    void moveShipAndVerticiesToCoords(double xPos, double yPos) {
+        globalCenterX = xPos;
+        globalCenterY = yPos;
+        for (int i = 0; i < verticies.length; i++) {
+            verticies[i].setNewLocalCoords(xPos, yPos);
+            xCoords[i] = (int)verticies[i].globalX;
+            yCoords[i] = (int)verticies[i].globalY;
+        }
+    }
+    void drawSelf(Graphics g) {
+        g.drawPolygon(myPoly);
     }
 }
