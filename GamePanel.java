@@ -37,9 +37,9 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		activeUFOs.clear();
 		for (int i = 0; i < 4; i++) {
 			PolarCoords randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200, rand.nextDouble() * 600, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
-			activeAsteroids.add(new Asteroid(randomAsteroidDirection, 20, 1));
+			activeAsteroids.add(new Asteroid(randomAsteroidDirection, 40, 1));
 			randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200 + 600, rand.nextDouble() * 600, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
-			activeAsteroids.add(new Asteroid(randomAsteroidDirection, 20, 1));
+			activeAsteroids.add(new Asteroid(randomAsteroidDirection, 40, 1));
 		}
 		myShip.moveShipAndVerticiesToCoords(400, 300);
 	}
@@ -160,7 +160,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 				Asteroid myAsteroid = activeAsteroids.get(j);
 				Bullet myBullet = activeBullets.get(i);
 				if (testIntersection(myAsteroid.myPoly, myBullet.myPoly)) {
-					System.out.println("an asteroid was hit by a bullet");
 					if (myAsteroid.varient != 2) {
 						PolarCoords randomAsteroidDirection = new PolarCoords(myAsteroid.globalCenterX, myAsteroid.globalCenterY, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
 						activeAsteroids.add(new Asteroid(randomAsteroidDirection, myAsteroid.minimumRadius / 2, myAsteroid.varient + 1));
@@ -174,6 +173,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 					break;
 				}
 			}
+			if (found) {break;}
 			for (int j = activeUFOs.size() - 1; j >= 0; j--) {
 				UFO myUFO = activeUFOs.get(j);
 				Bullet myBullet = activeBullets.get(i);
