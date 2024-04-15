@@ -87,4 +87,11 @@ public class UFO {
             yCoords[i] = (int)verticies[i].globalY;
         }
     }
+    void fireAtPlayer(ArrayList<Bullet> bulletList, Ship playerShip) {
+        double netXComponent = -globalCenterX+playerShip.globalCenterX;
+        double netYComponent = globalCenterY-playerShip.globalCenterY;
+        double angleToPlayer = 0;/*Math.toDegrees(Math.atan2(netYComponent, netXComponent));*/
+        PolarCoords bulletDirection = new PolarCoords(globalCenterX, globalCenterY, angleToPlayer, Bullet.MAXUFOSPEED);
+        bulletList.add(new Bullet(globalCenterX, globalCenterY, bulletDirection, true));
+    }
 }
