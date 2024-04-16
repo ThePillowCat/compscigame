@@ -30,6 +30,8 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	Font UIFnt_40 = null;
 	Font UIFnt_60 = null;
 	boolean spawnedAsteroids = false;
+	double lastTime = System.nanoTime();
+	double curTime = 0;
 
 	Ship myShip = new Ship();
 	ArrayList<Bullet> activeBullets = new ArrayList<Bullet>();
@@ -53,9 +55,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		g.setFont(UIFnt_40);
 		g.drawString("Click to Start", 250, 400);
 		g.setColor(Color.GREEN);
-		for (int i = 0; i < activeAsteroids.size(); i++) {
-			activeAsteroids.get(i).move();
-			g.drawPolygon(activeAsteroids.get(i).xCoords, activeAsteroids.get(i).yCoords, activeAsteroids.get(i).numOfVerticies);
+		for (int i = activeAsteroids.size()-1; i >= 0; i--) {
+			Asteroid curAsteroid = activeAsteroids.get(i);
+			curAsteroid.move();
+			g.drawPolygon(curAsteroid.xCoords, curAsteroid.yCoords, curAsteroid.numOfVerticies);
 		}
 	}
 
@@ -63,7 +66,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		activeAsteroids.clear();
 		activeBullets.clear();
 		activeUFOs.clear();
-		for (int i = 0; i < 2; i++) {
+		for (int i = 0; i < 5; i++) {
 			PolarCoords randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200, rand.nextDouble() * 600, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
 			activeAsteroids.add(new Asteroid(randomAsteroidDirection, 30, 1));
 			randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200 + 600, rand.nextDouble() * 600, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
@@ -99,7 +102,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		} catch (IOException | FontFormatException e) {
 			System.out.println("font no load");
 		}
-		timer = new Timer(20, this);
+		timer = new Timer(16, this);
 		timer.start();
 		setFocusable(true);
 		requestFocus();
@@ -174,6 +177,12 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 
 	@Override
 	public void paint(Graphics g) {
+		curTime = System.currentTimeMillis();
+		System.out.println((curTime-lastTime));
+		lastTime = System.currentTimeMillis();
+		if (true) {
+			return;
+		}
 		if (state.equals("menu")) {
 			runMenu(g);
 			return;
@@ -190,68 +199,66 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 
 		int mx = mouse.x - offset.x;
 		int my = mouse.y - offset.y;
-		g.drawString(String.format("SCORE: %d", score), 50, 50);
+		//g.drawString(String.format("SCORE: %d", score), 50, 50);
 		myShip.drawSelf(g);
 		g.drawOval((int) myShip.globalCenterX - 5, (int) myShip.globalCenterY - 5, 10, 10);
 		g.setColor(Color.GREEN);
 
+		// for (int i = activeBullets.size() - 1; i >= 0; i--) {
+		// 	boolean found = false;
+		// 	for (int j = activeAsteroids.size() - 1; j >= 0; j--) {
+		// 		Asteroid myAsteroid = activeAsteroids.get(j);
+		// 		Bullet myBullet = activeBullets.get(i);
+		// 		if (testIntersection(myAsteroid.myPoly, myBullet.myPoly) && !myBullet.isUFOBullet) {
+		// 			if (myAsteroid.varient != 3) {
+		// 				PolarCoords randomAsteroidDirection = new PolarCoords(myAsteroid.globalCenterX, myAsteroid.globalCenterY, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
+		// 				activeAsteroids.add(new Asteroid(randomAsteroidDirection, (int)(myAsteroid.minimumRadius / 1.5), myAsteroid.varient + 1));
+		// 				randomAsteroidDirection = new PolarCoords(myAsteroid.globalCenterX, myAsteroid.globalCenterY, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
+		// 				activeAsteroids.add(new Asteroid(randomAsteroidDirection, (int)(myAsteroid.minimumRadius / 1.5), myAsteroid.varient + 1));
+		// 			}
+		// 			activeAsteroids.remove(j);
+		// 			activeBullets.remove(i);
+		// 			score+=10*myAsteroid.varient;
+		// 			found = true;
+		// 			break;
+		// 		}
+		// 	}
+		// 	if (found) {break;}
+		// 	for (int j = activeUFOs.size() - 1; j >= 0; j--) {
+		// 		UFO myUFO = activeUFOs.get(j);
+		// 		Bullet myBullet = activeBullets.get(i);
+		// 		if (testIntersection(myUFO.myPoly, myBullet.myPoly) && !myBullet.isUFOBullet) {
+		// 			found = true;
+		// 			score+=50;
+		// 			activeUFOs.remove(myUFO);
+		// 			activeBullets.remove(myBullet);
+		// 			break;
+		// 		}
+		// 	}
+		// 	if (found) {break;}
+		// }
 		for (int i = activeBullets.size() - 1; i >= 0; i--) {
-			boolean found = false;
-			for (int j = activeAsteroids.size() - 1; j >= 0; j--) {
-				Asteroid myAsteroid = activeAsteroids.get(j);
-				Bullet myBullet = activeBullets.get(i);
-				if (testIntersection(myAsteroid.myPoly, myBullet.myPoly) && !myBullet.isUFOBullet) {
-					if (myAsteroid.varient != 3) {
-						PolarCoords randomAsteroidDirection = new PolarCoords(myAsteroid.globalCenterX, myAsteroid.globalCenterY, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
-						activeAsteroids.add(new Asteroid(randomAsteroidDirection, (int)(myAsteroid.minimumRadius / 1.5), myAsteroid.varient + 1));
-						randomAsteroidDirection = new PolarCoords(myAsteroid.globalCenterX, myAsteroid.globalCenterY, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
-						activeAsteroids.add(new Asteroid(randomAsteroidDirection, (int)(myAsteroid.minimumRadius / 1.5), myAsteroid.varient + 1));
-					}
-					activeAsteroids.remove(j);
-					activeBullets.remove(i);
-					score+=10*myAsteroid.varient;
-					found = true;
-					break;
-				}
-			}
-			if (found) {break;}
-			for (int j = activeUFOs.size() - 1; j >= 0; j--) {
-				UFO myUFO = activeUFOs.get(j);
-				Bullet myBullet = activeBullets.get(i);
-				if (testIntersection(myUFO.myPoly, myBullet.myPoly) && !myBullet.isUFOBullet) {
-					found = true;
-					score+=50;
-					activeUFOs.remove(myUFO);
-					activeBullets.remove(myBullet);
-					break;
-				}
-			}
-			if (found) {break;}
-		}
-		for (int i = 0; i < activeBullets.size(); i++) {
 			Bullet myBullet = activeBullets.get(i);
 			if (i > activeBullets.size() - 1) {
 				break;
 			}
-			if (myBullet.isUFOBullet && testIntersection(myBullet.myPoly, myShip.myPoly)) {
-				startNewLevel();
-				break;
-			}
+			// if (myBullet.isUFOBullet && testIntersection(myBullet.myPoly, myShip.myPoly)) {
+			// 	startNewLevel();
+			// 	break;
+			// }
 			g.setColor(myBullet.isUFOBullet ? Color.RED : Color.GREEN);
 			g.drawRect(myBullet.x, myBullet.y, 10, 10);
 			g.setColor(Color.GREEN);
 			activeBullets.get(i).move(i, activeBullets);
 		}
-		for (int i = 0; i < activeAsteroids.size(); i++) {
-			if (i > activeAsteroids.size() - 1) {
-				break;
-			}
-			if (testIntersection(activeAsteroids.get(i).myPoly, myShip.myPoly)) {
-				startNewLevel();
-				break;
-			}
-			activeAsteroids.get(i).move();
-			g.drawPolygon(activeAsteroids.get(i).xCoords, activeAsteroids.get(i).yCoords, activeAsteroids.get(i).numOfVerticies);
+		for (int i = activeAsteroids.size() - 1; i >= 0; i--) {
+			// if (testIntersection(activeAsteroids.get(i).myPoly, myShip.myPoly)) {
+			// 	startNewLevel();
+			// 	break;
+			// }
+			Asteroid curAsteroid = activeAsteroids.get(i);
+			curAsteroid.move();
+			g.drawPolygon(curAsteroid.xCoords, curAsteroid.yCoords, curAsteroid.numOfVerticies);
 		}
 		g.setColor(Color.PINK);
 		g.drawLine((int) myShip.verticies[0].localX, (int) myShip.verticies[0].localY, (int) myShip.verticies[0].globalX, (int) myShip.verticies[0].globalY);
@@ -271,19 +278,19 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		if (activeAsteroids.isEmpty()) {
 			startNewLevel();
 		}
-		for (int i = 0; i < activeUFOs.size(); i++) {
-			UFO currentUFO = activeUFOs.get(i);
-			currentUFO.moveSelf();
-			currentUFO.drawSelf(g);
-			if (UFOBulletFrameCount >= UFOBulletDelay) {
-				System.out.println("bloons");
-				currentUFO.fireAtPlayer(activeBullets, myShip);
-				UFOBulletFrameCount = 0;
-			}
-			if (testIntersection(myShip.myPoly, currentUFO.myPoly)) {
-				startNewLevel();
-				break;
-			}
-		}
+		// for (int i = 0; i < activeUFOs.size(); i++) {
+		// 	UFO currentUFO = activeUFOs.get(i);
+		// 	currentUFO.moveSelf();
+		// 	currentUFO.drawSelf(g);
+		// 	if (UFOBulletFrameCount >= UFOBulletDelay) {
+		// 		System.out.println("bloons");
+		// 		currentUFO.fireAtPlayer(activeBullets, myShip);
+		// 		UFOBulletFrameCount = 0;
+		// 	}
+		// 	if (testIntersection(myShip.myPoly, currentUFO.myPoly)) {
+		// 		startNewLevel();
+		// 		break;
+		// 	}
+		// }
 	}
 }
