@@ -205,7 +205,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		addMouseListener(this);
 	}
 
-	public void move() {	
+	public void move() {
+		if (myShip.deathAnimationActive || isTransitioningLevels) {
+			return ;
+		}
 		//controls pausing logic
 		if (keys[KeyEvent.VK_P] && canPause) {
 			paused = !paused;
