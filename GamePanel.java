@@ -36,20 +36,8 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	int UFOFrameCount = 0;
 	int UFOBulletDelay = 120;
 	int UFOBulletFrameCount = 0;
-<<<<<<< Updated upstream
-	int currentLevel = 1;
-	int score = 0;
-	int lives = 3;
-	String state = "menu";
-	Font UIFnt_40 = null;
-	Font UIFnt_60 = null;
-	boolean spawnedAsteroids = false;
-	double lastTime = System.nanoTime();
-	double curTime = 0;
-=======
 	int newLevelDelay = 120;
 	int newLevelFrameCount = newLevelDelay;
->>>>>>> Stashed changes
 
 	//GENERAL UI RELATED VARIABLES
 	static int currentLevel = 0;
@@ -115,18 +103,11 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		g.setFont(UIFnt_50);
 		g.drawString("Click to Start", 390, 550);
 		g.setColor(Color.GREEN);
-<<<<<<< Updated upstream
-		for (int i = activeAsteroids.size()-1; i >= 0; i--) {
-			Asteroid curAsteroid = activeAsteroids.get(i);
-			curAsteroid.move();
-			g.drawPolygon(curAsteroid.xCoords, curAsteroid.yCoords, curAsteroid.numOfVerticies);
-=======
 		//draws demo asteroids on title
 		for (int i = 0; i < activeAsteroids.size(); i++) {
 			Asteroid myAsteroid = activeAsteroids.get(i);
 			myAsteroid.move();
 			g.drawPolygon(myAsteroid.xCoords, myAsteroid.yCoords, myAsteroid.numOfVerticies);
->>>>>>> Stashed changes
 		}
 	}
 
@@ -159,17 +140,12 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		activeAsteroids.clear();
 		activeBullets.clear();
 		activeUFOs.clear();
-<<<<<<< Updated upstream
-		for (int i = 0; i < 5; i++) {
-			PolarCoords randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200, rand.nextDouble() * 600, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
-=======
 		currentLevel++;
 		teleportsLeft+=3;
 		for (int i = 0; i < currentLevel; i++) {
 			//add asteroids based on a random direction
 			PolarCoords randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200, rand.nextDouble() * HEIGHT,
 					rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
->>>>>>> Stashed changes
 			activeAsteroids.add(new Asteroid(randomAsteroidDirection, 30, 1));
 			randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200 + HEIGHT, rand.nextDouble() * HEIGHT,
 					rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
@@ -215,9 +191,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		} catch (IOException | FontFormatException e) {
 			System.out.println("font no load");
 		}
-<<<<<<< Updated upstream
-		timer = new Timer(16, this);
-=======
 		try {
 			UIFnt_100 = Font.createFont(Font.TRUETYPE_FONT, new File("fonts/Hyperspace-JvEM.ttf")).deriveFont(100f);
 		} catch (IOException | FontFormatException e) {
@@ -225,7 +198,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		}
 		//timer is set to around 60fps
 		timer = new Timer(15, this);
->>>>>>> Stashed changes
 		timer.start();
 		setFocusable(true);
 		requestFocus();
@@ -330,16 +302,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 
 	@Override
 	public void paint(Graphics g) {
-<<<<<<< Updated upstream
-		curTime = System.currentTimeMillis();
-		System.out.println((curTime-lastTime));
-		lastTime = System.currentTimeMillis();
-		if (true) {
-			return;
-		}
-=======
 		//run menu or game over screens if needed
->>>>>>> Stashed changes
 		if (state.equals("menu")) {
 			runMenu(g);
 			return;
@@ -365,60 +328,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		//playMusic();
 		g.setColor(Color.WHITE);
 
-<<<<<<< Updated upstream
-		Point mouse = MouseInfo.getPointerInfo().getLocation();
-		Point offset = getLocationOnScreen();
-
-		int mx = mouse.x - offset.x;
-		int my = mouse.y - offset.y;
-		//g.drawString(String.format("SCORE: %d", score), 50, 50);
-		myShip.drawSelf(g);
-		g.drawOval((int) myShip.globalCenterX - 5, (int) myShip.globalCenterY - 5, 10, 10);
-		g.setColor(Color.GREEN);
-
-		// for (int i = activeBullets.size() - 1; i >= 0; i--) {
-		// 	boolean found = false;
-		// 	for (int j = activeAsteroids.size() - 1; j >= 0; j--) {
-		// 		Asteroid myAsteroid = activeAsteroids.get(j);
-		// 		Bullet myBullet = activeBullets.get(i);
-		// 		if (testIntersection(myAsteroid.myPoly, myBullet.myPoly) && !myBullet.isUFOBullet) {
-		// 			if (myAsteroid.varient != 3) {
-		// 				PolarCoords randomAsteroidDirection = new PolarCoords(myAsteroid.globalCenterX, myAsteroid.globalCenterY, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
-		// 				activeAsteroids.add(new Asteroid(randomAsteroidDirection, (int)(myAsteroid.minimumRadius / 1.5), myAsteroid.varient + 1));
-		// 				randomAsteroidDirection = new PolarCoords(myAsteroid.globalCenterX, myAsteroid.globalCenterY, rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
-		// 				activeAsteroids.add(new Asteroid(randomAsteroidDirection, (int)(myAsteroid.minimumRadius / 1.5), myAsteroid.varient + 1));
-		// 			}
-		// 			activeAsteroids.remove(j);
-		// 			activeBullets.remove(i);
-		// 			score+=10*myAsteroid.varient;
-		// 			found = true;
-		// 			break;
-		// 		}
-		// 	}
-		// 	if (found) {break;}
-		// 	for (int j = activeUFOs.size() - 1; j >= 0; j--) {
-		// 		UFO myUFO = activeUFOs.get(j);
-		// 		Bullet myBullet = activeBullets.get(i);
-		// 		if (testIntersection(myUFO.myPoly, myBullet.myPoly) && !myBullet.isUFOBullet) {
-		// 			found = true;
-		// 			score+=50;
-		// 			activeUFOs.remove(myUFO);
-		// 			activeBullets.remove(myBullet);
-		// 			break;
-		// 		}
-		// 	}
-		// 	if (found) {break;}
-		// }
-		for (int i = activeBullets.size() - 1; i >= 0; i--) {
-			Bullet myBullet = activeBullets.get(i);
-			if (i > activeBullets.size() - 1) {
-				break;
-			}
-			// if (myBullet.isUFOBullet && testIntersection(myBullet.myPoly, myShip.myPoly)) {
-			// 	startNewLevel();
-			// 	break;
-			// }
-=======
 		//draw UI and ship
 		g.drawString(String.format("SCORE: %d", score), 50, 50);
 		g.drawString(String.format("LIVES: %d", lives), 950, 50);
@@ -481,22 +390,11 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 				break;
 			}
 			//set respective bullet colours
->>>>>>> Stashed changes
 			g.setColor(myBullet.isUFOBullet ? Color.RED : Color.GREEN);
 			g.drawRect(myBullet.x, myBullet.y, 10, 10);
 			g.setColor(Color.GREEN);
 			myBullet.move(i, activeBullets);
 		}
-<<<<<<< Updated upstream
-		for (int i = activeAsteroids.size() - 1; i >= 0; i--) {
-			// if (testIntersection(activeAsteroids.get(i).myPoly, myShip.myPoly)) {
-			// 	startNewLevel();
-			// 	break;
-			// }
-			Asteroid curAsteroid = activeAsteroids.get(i);
-			curAsteroid.move();
-			g.drawPolygon(curAsteroid.xCoords, curAsteroid.yCoords, curAsteroid.numOfVerticies);
-=======
 		for (int i = 0; i < activeAsteroids.size(); i++) {
 			//test if the asteroid collides with the ship
 			Asteroid myAsteroid = activeAsteroids.get(i);
@@ -518,7 +416,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		//draw particles
 		for (int i = 0; i < activeParticles.size(); i++) {
 			activeParticles.get(i).moveAndDrawSelf(g, activeParticles, i);
->>>>>>> Stashed changes
 		}
 		g.setColor(Color.PINK);
 		//update delay counters
@@ -535,22 +432,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 			UFOFrameCount = 0;
 			UFODelay = (int) rand.nextDouble() * (5 * 60) + 1000;
 		}
-<<<<<<< Updated upstream
-		// for (int i = 0; i < activeUFOs.size(); i++) {
-		// 	UFO currentUFO = activeUFOs.get(i);
-		// 	currentUFO.moveSelf();
-		// 	currentUFO.drawSelf(g);
-		// 	if (UFOBulletFrameCount >= UFOBulletDelay) {
-		// 		System.out.println("bloons");
-		// 		currentUFO.fireAtPlayer(activeBullets, myShip);
-		// 		UFOBulletFrameCount = 0;
-		// 	}
-		// 	if (testIntersection(myShip.myPoly, currentUFO.myPoly)) {
-		// 		startNewLevel();
-		// 		break;
-		// 	}
-		// }
-=======
 		//loop through active UFOs and handle logic like firing at the player
 		for (int i = 0; i < activeUFOs.size(); i++) {
 			UFO currentUFO = activeUFOs.get(i);
@@ -582,6 +463,5 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 			g.drawString("COMPLETE", 350,450);
 			startNewLevel();
 		}
->>>>>>> Stashed changes
 	}
 }
