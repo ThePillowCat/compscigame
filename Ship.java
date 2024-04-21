@@ -17,7 +17,7 @@ public class Ship {
     private PolarCoords[] deathVerticiesVelocities = new PolarCoords[10]; //used for death animation
     private ArrayList<ArrayList<Integer>> deathVerticies =  new ArrayList<>(); //stores points of different vectors on ship for death animation
     private PolarCoords thrustDirection = null; //acceleration vector
-    private PolarCoords heading = new PolarCoords(globalCenterX, globalCenterY, 0, 0); //direction the ship is currently facing
+    public PolarCoords heading = new PolarCoords(globalCenterX, globalCenterY, 0, 0); //direction the ship is currently facing
     private int[] xCoords = new int[10]; //xcoords and ycoords for drawing purposes
     private int[] yCoords = new int[10];
     private int[] thrusterXCoords = new int[10]; //xcoords and ycoords for drawing purposes
@@ -210,6 +210,7 @@ public class Ship {
         deathVerticies.add(point);
         point = new ArrayList<>(Arrays.asList((int)verticies[0].globalX, (int)verticies[0].globalY));
         deathVerticies.add(point);
+        deathVerticiesVelocities = new PolarCoords[20];
         //create random velocities for each death line
         for (int i = 0; i < deathVerticies.size(); i++) {
             deathVerticiesVelocities[i] = new PolarCoords(0, 0, rand.nextDouble()*360, 2);

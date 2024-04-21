@@ -141,7 +141,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		activeBullets.clear();
 		activeUFOs.clear();
 		currentLevel++;
-		teleportsLeft+=3;
+		teleportsLeft = 3;
 		for (int i = 0; i < currentLevel; i++) {
 			//add asteroids based on a random direction
 			PolarCoords randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200, rand.nextDouble() * HEIGHT,
@@ -161,6 +161,8 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		score = 0;
 		teleportsLeft = 0;
 		myShip.deathAnimationActive = false;
+		myShip.heading = new PolarCoords(myShip.globalCenterX, myShip.globalCenterY, 0, 0);
+		myShip.rotation = 0;
 	}
 
 	public Image loadImage(String img) {
@@ -206,7 +208,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	}
 
 	public void move() {
-		if (myShip.deathAnimationActive || isTransitioningLevels) {
+		if (myShip.deathAnimationActive || isTransitioningLevels || state != "game") {
 			return ;
 		}
 		//controls pausing logic
@@ -237,7 +239,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 			activeBullets.add(new Bullet((int) myShip.globalCenterX, (int) myShip.globalCenterY, myShip.verticies[0].resizeVectorReturned(20), false));
 			canShoot = false;
 		}
-		if (keys[KeyEvent.VK_E] && !state.equals("menu") && canTeleport) {
+		if (keys[KeyEvent.VK_E] && !state.equals("menu") && canTeleport && teleportsLeft >= 1) {
 			myShip.moveShipAndVerticiesToCoords(rand.nextDouble() * GamePanel.WIDTH, rand.nextDouble() * GamePanel.HEIGHT);
 			canTeleport = false;
 		}
@@ -260,8 +262,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		//handles flags so certian buttons only give out one input
 		keys[e.getKeyCode()] = false;
 		if (e.getKeyChar() == 'e') {
-			teleportsLeft--;
-			if (teleportsLeft > 0) {canTeleport = true;}
+			canTeleport = true;
+			if (teleportsLeft>=1) {
+				teleportsLeft--;
+			}
 		}
 		if (e.getKeyChar() == 'p') {
 			canPause = true;
