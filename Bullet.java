@@ -1,47 +1,53 @@
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.awt.geom.*;
 import java.awt.*;
 
+/*
+ * Program: Bullet.java
+ * Author: Noah Levy
+ * This is a class for handling bullet objects in the game. It handles their 
+ * rotation, velocities, sizes, and more. Units are in pixels.
+ * Each of these objects is in an arraylist in GamePanel.java
+ */
+
 public class Bullet {
-    int x, y, width = 10, height = 10, rightX, downX;
-    boolean isUFOBullet = false;
+    public int x, y, width = 10, height = 10, rightX, downX; //position and heights of bullets in pixels
+    public boolean isUFOBullet = false;
     public static final int MAXPEED = 10;
-    public static final int MAXUFOSPEED = 2;
-    PolarCoords direction = null;
-    int[] xCoords = new int[4];
-    int[] yCoords = new int[4];
-    Polygon myPoly = new Polygon(xCoords, yCoords, 4);
-    Area myArea = new Area(myPoly);
-    int bulletLife = 60;
-    int bulletLifeFrameCount = 0;
-    Bullet(int xPos, int yPos, PolarCoords d, boolean isBullet) {
+    public static final int MAXUFOSPEED = 7;
+    private PolarCoords direction = null; //bullet velocity
+    private int[] xCoords = new int[4]; //x coords and y coords for drawing
+    private int[] yCoords = new int[4];
+    public Polygon myPoly = new Polygon(xCoords, yCoords, 4); //polygon for collision
+    private int bulletLife = 60; //#of frames until deletion
+    private int bulletLifeFrameCount = 0; //time alive in frames
+    public Bullet(int xPos, int yPos, PolarCoords d, boolean isBullet) {
         x = xPos;
         y = yPos;
         direction = d;
         isUFOBullet = isBullet;
         d.normalize(MAXPEED);
     }
-    void move(int curIndex, ArrayList<Bullet> a) {
+    //handles movement and screen wrapping
+    public void move(int curIndex, ArrayList<Bullet> a) {
         bulletLifeFrameCount++;
-        x+=(direction.globalX-direction.localX);
-        y+=(direction.globalY-direction.localY);
+        x+=(direction.globalX-direction.localX);//adds x component of velocity
+        y+=(direction.globalY-direction.localY);//adds y component of velocity
         rightX = x+width;
         downX = y+height;
-        int[] xCoords = {x, (x+width), x, (x+width)};
+        int[] xCoords = {x, (x+width), x, (x+width)};//update drawing coords
         int[] yCoords = {y, y, (y+height), (y+height)};
         myPoly = new Polygon(xCoords, yCoords, 4);
-        myArea = new Area(myPoly);
-        if (x > 800) {
+        //handle screen wrapping
+        if (x > GamePanel.WIDTH) {
             x = 0;
         }
         if (x < 0) {
-            x = 800;
+            x = GamePanel.WIDTH;
         }
         if (y < 0) {
-            y = 600;
+            y = GamePanel.HEIGHT;
         }
-        if (y > 600) {
+        if (y > GamePanel.HEIGHT) {
             y = 0;
         }
         if (bulletLifeFrameCount >= bulletLife) {
