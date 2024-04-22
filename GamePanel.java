@@ -384,6 +384,10 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 					score += 50;
 					activeUFOs.remove(myUFO);
 					activeBullets.remove(myBullet);
+					//add particles
+					for (int k = 0; k < 10; k++) {
+						activeParticles.add(new Particle((int)myUFO.globalCenterX, (int)myUFO.globalCenterY, new PolarCoords(myUFO.globalCenterX, myUFO.globalCenterY, rand.nextDouble()*360, rand.nextDouble()*3+Particle.ASTEROIDPARTICLESPEED), Color.PINK));
+					}
 					break;
 				}
 			}

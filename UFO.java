@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class UFO {
-    private int globalCenterX, globalCenterY, numOfVerticies = 9; //handles position measured in pixles
+    public int globalCenterX, globalCenterY, numOfVerticies = 9; //handles position measured in pixles
     public final int MAXSPEED = 2;
     private int[] xCoords = new int[10]; //used for drawing purposes (verticies)
     private int[] yCoords = new int[10];
