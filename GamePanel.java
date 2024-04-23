@@ -49,7 +49,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	Font UIFnt_100 = null;
 
 	//HANDLES STATES
-	static String state = "game over";
+	static String state = "menu";
 	boolean spawnedAsteroids = false;
 	boolean canTeleport = true;
 	boolean isTransitioningLevels = false;
