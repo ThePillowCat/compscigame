@@ -18,8 +18,10 @@ public class Bullet {
     private int[] xCoords = new int[4]; //x coords and y coords for drawing
     private int[] yCoords = new int[4];
     public Polygon myPoly = new Polygon(xCoords, yCoords, 4); //polygon for collision
-    private int bulletLife = 60; //#of frames until deletion
-    private int bulletLifeFrameCount = 0; //time alive in frames
+    private int bulletLifeUFO = 60; //#of frames until UFO bullet deletion
+    private int bulletLifeUFOFrameCount = 0; //UFO bullet time alive in frames
+    private int bulletLife = 70; //#of frames until bullet deletion
+    private int bulletLifeFrameCount = 0; //bullet time alive in frames
     public Bullet(int xPos, int yPos, PolarCoords d, boolean isBullet) {
         x = xPos;
         y = yPos;
@@ -29,7 +31,13 @@ public class Bullet {
     }
     //handles movement and screen wrapping
     public void move(int curIndex, ArrayList<Bullet> a) {
-        bulletLifeFrameCount++;
+        //controls lifespan between UFO bullet and normal bullet
+        if (isUFOBullet) {
+            bulletLifeUFOFrameCount++;
+        }
+        else {
+            bulletLifeFrameCount++;
+        }
         x+=(direction.globalX-direction.localX);//adds x component of velocity
         y+=(direction.globalY-direction.localY);//adds y component of velocity
         rightX = x+width;
@@ -50,7 +58,11 @@ public class Bullet {
         if (y > GamePanel.HEIGHT) {
             y = 0;
         }
-        if (bulletLifeFrameCount >= bulletLife) {
+        //controls lifespan between UFO bullet and normal bullet
+        if (!isUFOBullet && bulletLifeFrameCount >= bulletLife) {
+            a.remove(curIndex);
+        }
+        if (isUFOBullet && bulletLifeUFOFrameCount >= bulletLifeUFO) {
             a.remove(curIndex);
         }
     }

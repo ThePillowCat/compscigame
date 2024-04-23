@@ -49,7 +49,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	Font UIFnt_100 = null;
 
 	//HANDLES STATES
-	static String state = "menu";
+	static String state = "game over";
 	boolean spawnedAsteroids = false;
 	boolean canTeleport = true;
 	boolean isTransitioningLevels = false;
@@ -66,23 +66,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	//SOUNDS
 	SoundEffect shoot = new SoundEffect("sounds/fire.wav");
 	SoundEffect thrust = new SoundEffect("sounds/thrust.wav");
-	SoundEffect beat1 = new SoundEffect("sounds/beat1.wav");
-	SoundEffect beat2 = new SoundEffect("sounds/beat2.wav");
-
-	//the following handles playing music
-	boolean isBeat1 = true;
-	public void playMusic() {
-		if (!beat1.c.isRunning() && !beat2.c.isRunning()) {
-			if (isBeat1) {
-				beat1.play();
-				isBeat1 = false;
-			}
-			else {
-				beat2.play();
-				isBeat1 = true;
-			}
-		}
-	}
+	SoundEffect[] explosions = {new SoundEffect("sounds/bangLarge.wav"), new SoundEffect("sounds/bangMedium.wav"), new SoundEffect("sounds/bangSmall.wav")};
 	public void runMenu(Graphics g) {
 		//draw asteroids for menu if not already spawned in
 		if (!spawnedAsteroids) {
@@ -110,8 +94,17 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 			g.drawPolygon(myAsteroid.xCoords, myAsteroid.yCoords, myAsteroid.numOfVerticies);
 		}
 	}
-
 	public void runGameOver(Graphics g) {
+		//draw asteroids for menu if not already spawned in
+		if (!spawnedAsteroids) {
+			activeAsteroids.clear();
+			for (int i = 0; i < 4; i++) {
+				PolarCoords randomAsteroidDirection = new PolarCoords(rand.nextDouble() * 200, rand.nextDouble() * GamePanel.HEIGHT,
+					rand.nextDouble() * 360, rand.nextDouble() * 2 + 1);
+			activeAsteroids.add(new Asteroid(randomAsteroidDirection, 30, 1));
+			}
+			spawnedAsteroids = true;
+		}
 		//draw game over UI
 		g.setColor(Color.BLACK);
 		g.fillRect(0, 0, GamePanel.WIDTH, GamePanel.HEIGHT);
@@ -120,6 +113,14 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		g.drawString("GAME OVER", 320, 450);
 		g.setFont(UIFnt_40);
 		g.drawString("Click to return to menu", 310, 500);
+		g.setFont(UIFnt_100);
+		g.drawString(String.format("SCORE: %d", score), 300, 100);
+		g.setColor(Color.GREEN);
+		for (int i = 0; i < activeAsteroids.size(); i++) {
+			Asteroid myAsteroid = activeAsteroids.get(i);
+			myAsteroid.move();
+			g.drawPolygon(myAsteroid.xCoords, myAsteroid.yCoords, myAsteroid.numOfVerticies);
+		}
 	}
 
 	public void startNewLevel() {
@@ -155,7 +156,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		myShip.moveShipAndVerticiesToCoords(WIDTH/2, HEIGHT/2);
 	}
 
-	//reset some variables
+	//reset some variables to start a new game
 	public void startNewGame() {
 		lives = 3;
 		score = 0;
@@ -163,10 +164,6 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 		myShip.deathAnimationActive = false;
 		myShip.heading = new PolarCoords(myShip.globalCenterX, myShip.globalCenterY, 0, 0);
 		myShip.rotation = 0;
-	}
-
-	public Image loadImage(String img) {
-		return new ImageIcon(img).getImage();
 	}
 
 	//convert passed in polygons to shape, test if they collide with Area.intersect
@@ -208,6 +205,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 	}
 
 	public void move() {
+		//if the screen is not the gameplay or certain other animations are being played, continue
 		if (myShip.deathAnimationActive || isTransitioningLevels || state != "game") {
 			return ;
 		}
@@ -337,7 +335,8 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 
 		//draw UI and ship
 		g.drawString(String.format("SCORE: %d", score), 50, 50);
-		g.drawString(String.format("LIVES: %d", lives), 950, 50);
+		g.drawString(String.format("LIVES: %d", lives), 900, 50);
+		g.drawString(String.format("LEVEL: %d", currentLevel), 500, 50);
 		myShip.drawSelf(g, myShip.invincibilityCount);
 		g.setColor(Color.GREEN);
 
@@ -360,6 +359,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 						activeAsteroids.add(new Asteroid(randomAsteroidDirection,
 								(int) (myAsteroid.minimumRadius / 1.5), myAsteroid.varient + 1));
 					}
+					explosions[myAsteroid.varient-1].play();
 					//add particle effects
 					activeAsteroids.remove(j);
 					for (int k = 0; k < 10; k++) {
@@ -382,6 +382,7 @@ class GamePanel extends JPanel implements KeyListener, ActionListener, MouseList
 				if (testIntersection(myUFO.myPoly, myBullet.myPoly) && !myBullet.isUFOBullet) {
 					found = true;
 					score += 50;
+					explosions[0].play();
 					activeUFOs.remove(myUFO);
 					activeBullets.remove(myBullet);
 					//add particles

@@ -185,6 +185,7 @@ public class Ship {
             int y1 = (deathVerticies.get(i).get(1))+(int)(deathVerticiesVelocities[i].globalY-deathVerticiesVelocities[i].localY);
             int x2 = (deathVerticies.get(i+1).get(0))+(int)(deathVerticiesVelocities[i].globalX-deathVerticiesVelocities[i].localX);
             int y2 = (deathVerticies.get(i+1).get(1))+(int)(deathVerticiesVelocities[i].globalY-deathVerticiesVelocities[i].localY);
+            //make sure to update arraylist with translated verticies
             g.drawLine(x1, y1, x2, y2);
             point = new ArrayList<>(Arrays.asList(x1, y1));
             deathVerticies.set(i, point);
